@@ -216,6 +216,15 @@ class Measured::MeasurableTest < ActiveSupport::TestCase
     assert_equal "5 fireball", Magic.new(Rational(5, 1), :fire).to_s
   end
 
+  test "#to_s(round: <integer>) outputs the number and the unit with correct rounding" do
+    assert_equal "1.23 magic_missile", Magic.new("1.234", :magic_missile).to_s(round: 2)
+    assert_equal "1.234 magic_missile", Magic.new("1.234", :magic_missile).to_s(round: -1)
+    assert_equal "1.234 magic_missile", Magic.new("1.234", :magic_missile).to_s
+    assert_equal "1.23 magic_missile", Magic.new(1.234, :magic_missile).to_s(round: 2)
+    assert_equal "0.13 magic_missile", Magic.new(Rational(1, 8), :magic_missile).to_s(round: 2)
+    assert_equal "123.89 fireball", Magic.new(BigDecimal("123.887788"), :fire).to_s(round: 2)
+  end
+
   test "#humanize outputs the number and the unit properly pluralized" do
     assert_equal "1 fireball", Magic.new("1", :fire).humanize
     assert_equal "10 fireballs", Magic.new(10, :fire).humanize

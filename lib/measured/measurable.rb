@@ -28,8 +28,8 @@ class Measured::Measurable < Numeric
     self.class.new(new_value, new_unit)
   end
 
-  def to_s
-    @to_s ||= "#{value_string} #{unit.name}"
+  def to_s(round: -1)
+    @to_s ||= "#{value_string(round: round)} #{unit.name}"
   end
 
   def humanize
@@ -77,17 +77,20 @@ class Measured::Measurable < Numeric
     value.is_a?(Measured::Unit) ? value : self.class.unit_system.unit_for!(value)
   end
 
-  def value_string
+  def value_string(round: -1)
     @value_string ||= begin
-      str = case value
+      float = case value
       when Rational
-        value.denominator == 1 ? value.numerator.to_s : value.to_f.to_s
+        value.denominator == 1 ? value.numerator : value.to_f
       when BigDecimal
-        value.to_s("F")
+        value.to_f
       else
-        value.to_f.to_s
+        value.to_f
       end
-      str.gsub(/\.0*\Z/, "")
+      unless round == -1
+        float = float.round(round)
+      end
+      float.to_s.gsub(/\.0*\Z/, "")
     end
   end
 end
